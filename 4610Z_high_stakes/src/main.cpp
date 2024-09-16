@@ -728,8 +728,10 @@ void selector(){
     RightFront.stop(brake);
     LeftRear.stop(brake);
     RightRear.stop(brake);
+    break;
    default:
      wait(1,seconds);
+     break;
  }
 }
 
