@@ -34,6 +34,7 @@ motor Intake=motor(PORT2, ratio6_1, true);
 motor Arm=motor(PORT5, ratio18_1, false);
 
 digital_out Clamp=digital_out(Brain.ThreeWirePort.A);
+digital_out Clearer=digital_out(Brain.ThreeWirePort.B);
 // digital_out Claw = digital_out(Brain.ThreeWirePort.D);
 // digital_out ClawFold = digital_out(Brain.ThreeWirePort.B);
 
@@ -864,6 +865,19 @@ void Controls(){
      Controller1.Screen.print("Clamp OFF");
    }
 
+   bool down = false;
+   if(Controller1.ButtonA.pressing()) {
+     while (Controller1.ButtonA.pressing()) {
+       wait(10, msec);
+     }
+     if(!down) {
+       Clearer.set(!Clearer.value());
+     }
+     down=true;
+   }
+   else {
+     down=false;
+   }
     wait(10, msec);
   }
 }
