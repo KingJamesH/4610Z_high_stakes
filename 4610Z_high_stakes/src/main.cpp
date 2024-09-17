@@ -89,11 +89,11 @@ void drawScreen(){
      }
    }
    else {
-     if (i+1 <= 2) {
+     if (i+1 <= 3) {
        fill = red;
        pen = red;
      }
-     else if (i+1 > 2) {
+     else if (i+1 > 3 && i+1 <= 6) {
        fill = blue;
        pen = blue;
      }
@@ -107,11 +107,9 @@ void drawScreen(){
    Brain.Screen.drawRectangle(x1+(spacing*i), y1, x2, y2, fill);
  }
 
-
  while(true){
    int x = Brain.Screen.xPosition();
    int y = Brain.Screen.yPosition();
-
 
    if (y1 < y && y < y1+y2) {
      for (int i = 0; i < autonTotal; i++) {
@@ -237,7 +235,6 @@ void pre_auton(void) {
 
 double x = 0.0, y = 0.0, theta = 0.0, prevTheta = 0.0, RobotPosition;
 
-
 // Constants
 const double WHEEL_DIAMETER = 3.25; // Example wheel diameter in inches
 const double WHEEL_CIRCUMFERENCE = WHEEL_DIAMETER * M_PI;
@@ -260,19 +257,13 @@ void updateOdometry() {
    // Get the positions of the encoders
    //double EncPosition = VertEncoder.position(degrees) ;
    double EncPosition = (RightFront.position(degrees)+RightRear.position(degrees)+RightMiddle.position(degrees)+LeftFront.position(degrees)+LeftMiddle.position(degrees)+LeftRear.position(degrees))/6 ;
-  
 
-
-   // Calculate the distances each wheel has traveled in inches
-  
-  
+   // Calculate the distances each wheel has traveled in inches  
    // Get the current orientation from the inertial sensor
    double currentTheta = Gyro.rotation(degrees) * M_PI / 180.0; // Convert to radians
 
-
    // Calculate the change in orientation
    double deltaTheta = currentTheta - prevTheta;
-
 
    RobotPosition = (EncPosition / TICKS_PER_REV) * WHEEL_CIRCUMFERENCE;
   
@@ -284,7 +275,6 @@ void updateOdometry() {
    RobotPosition = ((EncPosition / TICKS_PER_REV) * WHEEL_CIRCUMFERENCE);
    prevTheta = currentTheta;
    positionMutex.unlock();
-
 
    // Add a small delay to prevent CPU hogging
    this_thread::sleep_for(10);
@@ -309,7 +299,6 @@ void drivePDC(double target, int angle) {
    double ierror = goal - RobotPosition;
    double tError = angle - Gyro.rotation(degrees);
 
-
    double derivative = 0;
    double kP = 0.15;
    double kD = 0.1;
@@ -317,15 +306,11 @@ void drivePDC(double target, int angle) {
    double previousError = 0;
    double speedfactor;
 
-
    while (fabs(error) > .25) {
        // Update current position
-
-
        // Calculate errors
        error = goal - RobotPosition;
        tError = angle - Gyro.rotation(degrees);
-
 
        speedfactor= fabs(error)/(3.5*fabs(ierror));
         if (error>45){
@@ -338,7 +323,6 @@ void drivePDC(double target, int angle) {
        double ioutput = ((error*20) * kP + derivative * kD);
        double output = ioutput*speedfactor;
 
-
        // Speed clamping
        if (output > 100) {
            output = 100;
@@ -350,10 +334,8 @@ void drivePDC(double target, int angle) {
            output = -15;
        }
 
-
        // Update previous error
        previousError = error;
-
 
        // Motor control with angle correction
        LeftRear.spin(forward, output+tError*ktp, pct);
@@ -364,7 +346,6 @@ void drivePDC(double target, int angle) {
        RightFront.spin(forward, output-tError*ktp, pct);
        wait(10, msec);
    }
-
 
    // Stop motors
    LeftRear.stop(brake);
@@ -381,7 +362,6 @@ void drivePDCLong(double target, int angle) {
    double ierror = goal - RobotPosition;
    double tError = angle - Gyro.rotation(degrees);
 
-
    double derivative = 0;
    double kP = 0.15;
    double kD = 0.1;
@@ -389,11 +369,8 @@ void drivePDCLong(double target, int angle) {
    double previousError = 0;
    double speedfactor;
 
-
    while (fabs(error) > .25) {
        // Update current position
-
-
        // Calculate errors
        error = goal - RobotPosition;
        tError = angle - Gyro.rotation(degrees);
@@ -410,7 +387,6 @@ void drivePDCLong(double target, int angle) {
        double ioutput = ((error*20) * kP + derivative * kD);
        double output = ioutput*speedfactor;
 
-
        // Speed clamping
        if (output > 100) {
            output = 100;
@@ -422,10 +398,8 @@ void drivePDCLong(double target, int angle) {
            output = -15;
        }
 
-
        // Update previous error
        previousError = error;
-
 
        // Motor control with angle correction
        LeftRear.spin(forward, output+tError*ktp, pct);
@@ -436,7 +410,6 @@ void drivePDCLong(double target, int angle) {
        RightFront.spin(forward, output-tError*ktp, pct);
        wait(10, msec);
    }
-
 
    // Stop motors
    LeftRear.stop(brake);
@@ -452,7 +425,6 @@ void stupidRun(double target) {
    double error = goal - RobotPosition;
    double ierror = goal - RobotPosition;
 
-
    double derivative = 0;
    double kP = 0.5;
    double kD = 0.25;
@@ -462,18 +434,13 @@ void stupidRun(double target) {
    while (fabs(error) > .5) {
        // Update current position
 
-
        // Calculate errors
        error = goal - RobotPosition;
-
-
-
 
        // Calculate derivative before using it
       
        derivative = (error*50) - previousError;
        double output = ((error*50) * kP + derivative * kD);
-
 
        // Speed clamping
        if (output > 100) {
@@ -486,10 +453,8 @@ void stupidRun(double target) {
            output = -10;
        }
 
-
        // Update previous error
        previousError = error;
-
 
        // Motor control with angle correction
        LeftRear.spin(forward, output, pct);
@@ -500,7 +465,6 @@ void stupidRun(double target) {
        RightFront.spin(forward, output, pct);
        wait(10, msec);
    }
-
 
    // Stop motors
    LeftRear.stop(brake);
@@ -517,14 +481,11 @@ void turnPD(int angle) {
    double kP = 0.35;
    double previousError;
 
-
    double error = angle - Gyro.rotation(degrees);
     while (fabs(error) > 2.5) {
        error = angle - Gyro.rotation(degrees);
 
-
        int output = (error * kP + derivative * kD) ;
-
 
        // Speed clamping
        if (output > 100) {
@@ -695,6 +656,7 @@ void preload() {
   wait(2,seconds);
   Clamp.set(false);
 }
+
 void selector(){
  switch(autonNum){
    case 1:
@@ -806,27 +768,19 @@ void autonomous(void) {
 void LogDrive(){
  double LeftSpeed, RightSpeed;
  double LeftStick, RightStick;
- while (true)
- {
-
-
-   if (Controller1.Axis1.value() >= 100)
-   {
+ while (true) {
+   if (Controller1.Axis1.value() >= 100) {
      RightStick = 75;
    }
-   else if (Controller1.Axis1.value() <= -100)
-   {
+   else if (Controller1.Axis1.value() <= -100) {
      RightStick = -75;
    }
-   else
-   {
+   else {
      RightStick = Controller1.Axis1.value();
    }
 
-
    LeftSpeed = (fabs(RightStick) * RightStick / 127);
    RightSpeed = (fabs(Controller1.Axis3.position()) * Controller1.Axis3.position()) / 127;
-
 
    LeftFront.spin(forward, RightSpeed + LeftSpeed, percent);
    LeftMiddle.spin(forward, RightSpeed + LeftSpeed, percent);
@@ -836,7 +790,6 @@ void LogDrive(){
    RightRear.spin(forward, RightSpeed - LeftSpeed, percent);
  }
 }
-
 
 void Controls(){
   while (true) {
@@ -882,15 +835,12 @@ void Controls(){
   }
 }
 
-
 void usercontrol(void) {
  thread a (LogDrive);
  thread b (Controls);
 
-
  wait(20, msec); // Sleep the task for a short amount of time to prevent wasted resources.
  }
-
 
 //
 // Main will set up the competition functions and callbacks.
